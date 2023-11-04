@@ -22,7 +22,8 @@ a,
 }
 
 @media (min-width: 1024px) {
-  body {}
+  body {
+  }
 
   #app {
     grid-template-columns: 1fr 1fr;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Greetings from './components/Greetings.vue'
-import InputZone from './components/InputZone.vue';
-import Chart from './components/Chart.vue';
+import InputZone from './components/InputZone.vue'
+import LevelsChart from './components/LevelsChart.vue'
 </script>
 
 <template>
@@ -13,7 +13,7 @@ import Chart from './components/Chart.vue';
 
   <main>
     <div class="content-wrapper">
-      <Chart />
+      <LevelsChart />
       <InputZone />
     </div>
   </main>
