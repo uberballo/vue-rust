@@ -1,5 +1,6 @@
 use axum::{http::StatusCode, response::IntoResponse, routing::get, routing::post, Router};
 use http::header::CONTENT_TYPE;
+use tower_http::trace::TraceLayer;
 
 use crate::controllers;
 
@@ -13,6 +14,9 @@ impl Server {
     }
 
     pub async fn start(&self) {
+
+        tracing_subscriber::fmt::init();
+
         let routes = Router::new()
             .route("/", get(|| async { "Hello, World!" }))
             .route(
@@ -26,14 +30,14 @@ impl Server {
 
         let app = Router::new()
             .merge(routes)
+            .layer(TraceLayer::new_for_http())
             .layer(
                 tower_http::cors::CorsLayer::new()
                     .allow_origin(tower_http::cors::Any)
                     .allow_headers([CONTENT_TYPE])
                     .allow_methods([axum::http::Method::GET, axum::http::Method::POST]),
             )
-            .fallback(handler_404)
-            .layer(tower_http::trace::TraceLayer::new_for_http());
+            .fallback(handler_404);
 
         axum::Server::bind(&self.address.parse().unwrap())
             .serve(app.into_make_service())

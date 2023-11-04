@@ -42,7 +42,7 @@ fn get_color_levels(image: DynamicImage) -> Vec<(Rgb<u8>, isize)> {
     }
     let mut values: Vec<(image::Rgb<u8>, isize)> = map.into_iter().collect();
     values.sort_by(|a, b| b.1.cmp(&a.1));
-    values.truncate(10);
+    values.truncate(50);
     return values;
 }
 
