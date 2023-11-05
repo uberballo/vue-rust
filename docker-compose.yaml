@@ -1,0 +1,25 @@
+services:
+  fronted:
+    image: frontend:latest
+    build:
+      context: ./front
+      dockerfile: ./Dockerfile
+    ports:
+      - "80:80"
+    stdin_open: true
+    networks:
+      - frontBack
+
+  backend:
+    image: backend:latest
+    build:
+      context: ./back
+      dockerfile: ./Dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - frontBack
+
+networks:
+  frontBack:
+    name: frontBack

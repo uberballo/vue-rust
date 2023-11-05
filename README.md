@@ -8,8 +8,9 @@ On the backend we use [Axum](https://github.com/tokio-rs/axum) and [Image](https
 
 
 ### How to run  
-TODO
-
+Easiest way is by using Docker. Run the following:  
+``` docker compose up -D```   
+After everything is up and running, you can access the service on `localhost`.
 
 ### To do  
 If we'd like to achieve a production-quality software, we need to add and/or update quite a bit. 
