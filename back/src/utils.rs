@@ -1,4 +1,4 @@
-use std::{fs, error::Error, convert::Infallible };
+use std::{fs, error::Error };
 
 use fancy_regex::Regex;
 use image::{Rgb, ImageFormat};

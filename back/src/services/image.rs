@@ -1,7 +1,7 @@
 use crate::types::{ColorLevels, DataUrl};
-use crate::utils::{read_file_string, get_data_url_format_and_data};
+use crate::utils::{get_data_url_format_and_data, read_file_string};
 use base64::{engine::general_purpose, Engine as _};
-use image::{DynamicImage, GenericImageView, Pixel, Rgb, ImageFormat, ImageOutputFormat};
+use image::{DynamicImage, GenericImageView, Pixel, Rgb, ImageOutputFormat};
 use std::collections::HashMap;
 use std::error::Error;
 use std::io::Cursor;
@@ -51,7 +51,7 @@ fn convert_jpg_to_base64(image: DynamicImage, output_format: ImageOutputFormat, 
     }
     let content = general_purpose::STANDARD.encode(buf.get_ref());
     return Ok(format!(
-        "data:{};base64,{}",
+        "data:image/{};base64,{}",
         mime_type,
         content.replace("\r\n", "")
     ));
