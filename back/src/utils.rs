@@ -1,9 +1,9 @@
-use std::{fs, error::Error };
+use std::{error::Error, fs};
 
 use fancy_regex::Regex;
-use image::{Rgb, ImageFormat};
+use image::{ImageFormat, Rgb};
 
-use crate::types::{DataUrl};
+use crate::types::DataUrl;
 
 fn number_to_hex(number: u8) -> String {
     let hex = format!("{:x}", number);
@@ -23,7 +23,6 @@ fn rbg_to_hex_works() {
     let result = rgb_to_hex(input);
     assert_eq!(result, "#646464")
 }
-
 pub fn read_file_string(filename: &str) -> String {
     fs::read_to_string(filename).expect("Should have been able to read the file")
 }
@@ -38,16 +37,17 @@ fn read_file_works() {
 pub fn get_data_url_format_and_data(data_url: String) -> Result<DataUrl, Box<dyn Error>> {
     Ok(DataUrl {
         format: get_data_url_format(&data_url)?,
-        data: get_data_url_data(&data_url)?
+        data: get_data_url_data(&data_url)?,
     })
 }
 
-fn get_data_url_format(data_url: &str) -> Result<ImageFormat ,&str> {
+fn get_data_url_format(data_url: &str) -> Result<ImageFormat, String> {
     let format_string = get_data_url_mime_type(data_url)?.to_owned();
-    ImageFormat::from_mime_type(format_string).ok_or("Invalid mime type")
+    ImageFormat::from_mime_type(format_string.clone())
+        .ok_or(format!("Invalid mime type. Found: {}", &format_string))
 }
 
-fn get_data_url_mime_type(data_url: &str) -> Result<&str ,&str>{
+fn get_data_url_mime_type(data_url: &str) -> Result<&str, &str> {
     let re = Regex::new(r"(?<=data:)(.*)(?=;)").unwrap();
     let result = re.captures(data_url).expect("Failed to capture");
     let captures = result.expect("No match found");
@@ -55,13 +55,12 @@ fn get_data_url_mime_type(data_url: &str) -> Result<&str ,&str>{
     Ok(group.as_str())
 }
 
-fn get_data_url_data(data_url: &str) -> Result<String, &str>{
+fn get_data_url_data(data_url: &str) -> Result<String, &str> {
     let re = Regex::new(r"(?<=base64,)(.*)").unwrap();
     let result = re.captures(data_url).expect("Failed to capture");
     let captures = result.expect("No match found");
     let group = captures.get(1).expect("No group");
     Ok(group.as_str().to_owned())
-
 }
 
 #[test]

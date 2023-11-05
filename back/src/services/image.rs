@@ -1,7 +1,7 @@
 use crate::types::{ColorLevels, DataUrl};
 use crate::utils::{get_data_url_format_and_data, read_file_string};
 use base64::{engine::general_purpose, Engine as _};
-use image::{DynamicImage, GenericImageView, Pixel, Rgb, ImageOutputFormat};
+use image::{DynamicImage, GenericImageView, ImageOutputFormat, Pixel, Rgb};
 use std::collections::HashMap;
 use std::error::Error;
 use std::io::Cursor;
@@ -43,15 +43,21 @@ fn get_color_levels(image: DynamicImage) -> Vec<(Rgb<u8>, isize)> {
     return values;
 }
 
-fn convert_jpg_to_base64(image: DynamicImage, output_format: ImageOutputFormat, mime_type: &str) -> Result<String, Box<dyn Error>> {
+fn convert_jpg_to_base64(
+    image: DynamicImage,
+    output_format: ImageOutputFormat,
+    mime_type: &str,
+) -> Result<String, Box<dyn Error>> {
     let mut buf = Cursor::new(vec![]);
     match output_format {
-        ImageOutputFormat::Jpeg(x) => image.write_to(&mut buf, image::ImageOutputFormat::Jpeg(x))?,
-        _ => image.write_to(&mut buf, output_format)?
+        ImageOutputFormat::Jpeg(x) => {
+            image.write_to(&mut buf, image::ImageOutputFormat::Jpeg(x))?
+        }
+        _ => image.write_to(&mut buf, output_format)?,
     }
     let content = general_purpose::STANDARD.encode(buf.get_ref());
     return Ok(format!(
-        "data:image/{};base64,{}",
+        "data:{};base64,{}",
         mime_type,
         content.replace("\r\n", "")
     ));
