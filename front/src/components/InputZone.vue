@@ -5,27 +5,37 @@ import { useColorLevelsStore } from '../stores/colorLevels'
 const imageStore = useImageStore()
 const colorLevelsStore = useColorLevelsStore()
 
-const handleFileChange = (event: Event) => {
+const handleDragEvent = (event: DragEvent) => {
+  if (event.dataTransfer?.files[0]) {
+    let file = event.dataTransfer.files[0]
+    uploadImage(file)
+  }
+}
+
+const handleInputEvent = (event: Event) => {
   const target = event.target as HTMLInputElement
-  if (target && target.files) {
-    console.log(target.files[0])
+  if (target.files && target.files[0]) {
     let file = target.files[0]
-    //Unsued
-    const fileName = file.name
+    uploadImage(file)
+  }
+}
 
-    const formData = new FormData()
+const uploadImage = (file: File) => {
+  //Unsued
+  const fileName = file.name
 
-    let reader = new FileReader()
-    reader.readAsDataURL(file)
+  const formData = new FormData()
 
-    reader.onload = (e) => {
-      if (e && e.target) {
-        const preview = e.target.result as string
-        formData.append('file', preview)
-        const file = formData.get('file')
-        if (file) {
-          imageStore.addImage(file)
-        }
+  let reader = new FileReader()
+  reader.readAsDataURL(file)
+
+  reader.onload = (e) => {
+    if (e && e.target) {
+      const preview = e.target.result as string
+      formData.append('file', preview)
+      const file = formData.get('file')
+      if (file) {
+        imageStore.addImage(file)
       }
     }
   }
@@ -58,16 +68,17 @@ const invertImage = async () => {
       <div
         class="dropzone"
         @dragover.prevent
+        accept="image/png, image/jpeg"
         @dragenter.prevent
         @dragstart.prevent
-        @drop.prevent="handleFileChange($event)"
+        @drop.prevent="handleDragEvent($event)"
       >
         <input
           id="file-input"
           type="file"
           accept="image/png, image/jpeg"
           required
-          @change="handleFileChange($event)"
+          @change="handleInputEvent($event)"
         />
         <h2 for="file-input">Click or Drag N Drop Image</h2>
         <img v-if="imageStore.image" v-bind:src="imageStore.image as string" />
@@ -87,8 +98,8 @@ const invertImage = async () => {
 .dropzone {
   height: fit-content;
   min-height: 200px;
-  max-height: 400px;
-  width: 400px;
+  max-height: 700px;
+  width: 600px;
   background: #fdfdfd;
   border-radius: 5px;
   border: 2px dashed #000;
@@ -115,27 +126,33 @@ img {
 
 button {
   background-color: transparent;
-  border: 2px solid #e74c3c;
+  border: 2px solid #000000;
   border-radius: 1em;
-  color: #e74c3c;
+  color: #030101;
   cursor: pointer;
-  display: flex;
   align-self: center;
   font-size: 1rem;
-  margin: 20px;
+  margin: 10px;
   padding: 1.2em 2.4em;
   text-align: center;
   text-transform: uppercase;
   font-family: 'Montserrat', sans-serif;
   font-weight: 700;
+  width: 100%;
+  padding: auto;
 }
 
 .input-wrapper {
   display: flex;
   flex-direction: column;
+  width: 50%;
 }
 
 .button-wrapper {
-  display: flex;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  align-items: center;
+  margin-left: 50%;
 }
 </style>

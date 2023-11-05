@@ -19,7 +19,7 @@ export const postAnalyzeColorLevels = async (
         }
       }
     )
-    console.log("Data: ",result.data)
+    console.log('Data: ', result.data)
     return result.data
 
     // Really simple error handling. We just console log the error and return undefined.

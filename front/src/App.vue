@@ -13,8 +13,8 @@ import LevelsChart from './components/LevelsChart.vue'
 
   <main>
     <div class="content-wrapper">
-      <LevelsChart />
       <InputZone />
+      <LevelsChart />
     </div>
   </main>
 </template>
@@ -25,9 +25,11 @@ header {
 }
 
 .content-wrapper {
-  padding: auto;
   display: flex;
   justify-content: space-around;
   align-items: center;
+  gap: 10%;
+  padding: 10%;
+  flex-direction: row-reverse;
 }
 </style>
