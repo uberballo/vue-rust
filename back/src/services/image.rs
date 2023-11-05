@@ -1,38 +1,35 @@
-use crate::types::ColorLevels;
-use crate::utils::read_file_string;
+use crate::types::{ColorLevels, DataUrl};
+use crate::utils::{read_file_string, get_data_url_format_and_data};
 use base64::{engine::general_purpose, Engine as _};
-use image::{DynamicImage, GenericImageView, Pixel, Rgb};
+use image::{DynamicImage, GenericImageView, Pixel, Rgb, ImageFormat, ImageOutputFormat};
 use std::collections::HashMap;
 use std::error::Error;
 use std::io::Cursor;
 
 pub fn convert_and_get_levels(data: String) -> Result<ColorLevels, Box<dyn Error>> {
-    let image = convert_data_url_to_jpg(data)?;
+    let image = convert_data_url_to_image(data)?;
     Ok(ColorLevels {
         levels: get_color_levels(image),
     })
 }
 
 pub fn convert_and_invert_colors(data: String) -> Result<String, Box<dyn Error>> {
-    let mut image = convert_data_url_to_jpg(data)?;
+    let data_url = get_data_url_format_and_data(data)?;
+    let output_format = ImageOutputFormat::from(data_url.format);
+    let mime_type = data_url.format.to_mime_type();
+    let mut image = convert_base64_to_image(data_url)?;
     image.invert();
-    convert_jpg_to_base64(image)
+    convert_jpg_to_base64(image, output_format, mime_type)
 }
 
-//Support only base64 encoded jpeg images
-fn get_image_data_from_base64(base64: String) -> Option<String> {
-    match base64.contains("data:image/jpeg;base64,") {
-        false => None,
-        true => base64.split(",").map(String::from).last(),
-    }
+fn convert_data_url_to_image(data: String) -> Result<DynamicImage, Box<dyn Error>> {
+    let data_url = get_data_url_format_and_data(data)?;
+    Ok(convert_base64_to_image(data_url)?)
 }
-fn convert_data_url_to_jpg(data: String) -> Result<DynamicImage, Box<dyn Error>> {
-    let base64_image_data = get_image_data_from_base64(data).ok_or("Invalid data")?;
-    Ok(convert_base64_to_jpg(base64_image_data)?)
-}
-fn convert_base64_to_jpg(data: String) -> Result<DynamicImage, image::ImageError> {
-    let content = general_purpose::STANDARD.decode(data).unwrap();
-    image::load_from_memory_with_format(&content, image::ImageFormat::Jpeg)
+
+fn convert_base64_to_image(data_url: DataUrl) -> Result<DynamicImage, image::ImageError> {
+    let content = general_purpose::STANDARD.decode(data_url.data).unwrap();
+    image::load_from_memory_with_format(&content, data_url.format)
 }
 
 fn get_color_levels(image: DynamicImage) -> Vec<(Rgb<u8>, isize)> {
@@ -46,12 +43,16 @@ fn get_color_levels(image: DynamicImage) -> Vec<(Rgb<u8>, isize)> {
     return values;
 }
 
-fn convert_jpg_to_base64(image: DynamicImage) -> Result<String, Box<dyn Error>> {
+fn convert_jpg_to_base64(image: DynamicImage, output_format: ImageOutputFormat, mime_type: &str) -> Result<String, Box<dyn Error>> {
     let mut buf = Cursor::new(vec![]);
-    image.write_to(&mut buf, image::ImageOutputFormat::Jpeg(65))?;
+    match output_format {
+        ImageOutputFormat::Jpeg(x) => image.write_to(&mut buf, image::ImageOutputFormat::Jpeg(x))?,
+        _ => image.write_to(&mut buf, output_format)?
+    }
     let content = general_purpose::STANDARD.encode(buf.get_ref());
     return Ok(format!(
-        "data:image/jpeg;base64,{}",
+        "data:{};base64,{}",
+        mime_type,
         content.replace("\r\n", "")
     ));
 }
@@ -59,22 +60,7 @@ fn convert_jpg_to_base64(image: DynamicImage) -> Result<String, Box<dyn Error>> 
 #[test]
 fn convert_jpg_to_base64_works() {
     let img = image::open("image.jpg").expect("FileNotFound");
-    let content = convert_jpg_to_base64(img).unwrap();
+    let content = convert_jpg_to_base64(img, ImageOutputFormat::Jpeg(65), "Jpeg").unwrap();
     let text = read_file_string("img-base64.txt");
     assert_eq!(content, text);
-}
-
-#[test]
-fn get_image_data_from_base64_works() {
-    let data = "/9j/AAD/".to_string();
-    let input = format!("data:image/jpeg;base64,{}", data);
-    let result = get_image_data_from_base64(input).unwrap();
-    assert_eq!(result, data);
-}
-
-#[test]
-fn get_image_data_from_base64_returns_error() {
-    let input = "something".to_string();
-    let result = get_image_data_from_base64(input);
-    assert_eq!(result, None);
 }

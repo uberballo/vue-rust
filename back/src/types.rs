@@ -1,4 +1,5 @@
-use image::Rgb;
+use axum::Form;
+use image::{Rgb, ImageFormat, DynamicImage};
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
 use crate::utils::rgb_to_hex;
@@ -38,7 +39,18 @@ impl Serialize for ColorLevels {
         json.serialize_field(
             "colorLevels",&colors
         )?;
-
         json.end()
     }
+}
+
+pub struct DataUrl {
+    pub format: ImageFormat,
+    pub data: String
+}
+
+
+// DynamicImage doesn't contain any information about the format.
+pub struct ImageWithFormat {
+    pub image: DynamicImage,
+    pub format: ImageFormat
 }
