@@ -10,7 +10,21 @@ On the backend we use [Axum](https://github.com/tokio-rs/axum) and [Image](https
 ### How to run  
 Easiest way is by using Docker. Run the following:  
 ``` docker compose up -D```   
-After everything is up and running, you can access the service on `localhost`.
+After everything is up and running, you can access the service on `localhost`. 
+
+#### Setup
+If you want to run them without docker, you need [Rust](https://www.rust-lang.org/tools/install) and [Node.js](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). Tested with `rustc 1.73.0` and `Node v21.1.0`.  
+* First install frontend dependencies with `npm i` in `vue-rust/front`.  
+
+#### Start locally
+After you've finished the necessary setup do the following to start locally: 
+* Start the backend by running `cargo run` in `vue-rust/back` directory.  
+* Start the development service with `npm run dev` on the `vue-rust/front` directory.  
+
+### Testing  
+After setup, run the following to run the tests: 
+* Start the backend unit tests by running `cargo test` in `vue-rust/back` directory.  
+* Start the frontend unit tests with `npm run test:unit` on the `vue-rust/front` directory.  
 
 ### To do  
 If we'd like to achieve a production-quality software, we need to add and/or update quite a bit. 
