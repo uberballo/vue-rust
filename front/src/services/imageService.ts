@@ -1,8 +1,8 @@
 import type { ColorLevels } from '@/stores/colorLevels'
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, type AxiosResponse } from 'axios'
 
-export const getRequest = async () => {
-  console.log(await axios.get('http://localhost:3000'))
+export const getHealth = async (): Promise<AxiosResponse> => {
+  return await axios.get('http://localhost:3000').catch(e => { return e })
 }
 
 export const postAnalyzeColorLevels = async (

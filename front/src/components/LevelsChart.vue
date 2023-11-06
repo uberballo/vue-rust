@@ -49,5 +49,6 @@ const options = {
 </script>
 
 <template>
+  <!-- @vue-ignore -->
   <Bar :data="data" :options="options" />
 </template>

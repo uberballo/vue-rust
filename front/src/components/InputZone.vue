@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { getRequest, postAnalyzeColorLevels, postInvertColors } from '../services/imageService'
+import { getHealth, postAnalyzeColorLevels, postInvertColors } from '../services/imageService'
 import { useImageStore } from '../stores/image'
 import { useColorLevelsStore } from '../stores/colorLevels'
+import { ref, type Ref } from 'vue'
 const imageStore = useImageStore()
 const colorLevelsStore = useColorLevelsStore()
+const fileName: Ref<String | undefined> = ref(undefined)
 
 const handleDragEvent = (event: DragEvent) => {
   if (event.dataTransfer?.files[0]) {
@@ -21,8 +23,7 @@ const handleInputEvent = (event: Event) => {
 }
 
 const uploadImage = (file: File) => {
-  //Unsued
-  const fileName = file.name
+  fileName.value = file.name
 
   const formData = new FormData()
 
@@ -42,7 +43,6 @@ const uploadImage = (file: File) => {
 }
 
 const getColorLevels = async () => {
-  console.log(imageStore.image)
   if (imageStore.image) {
     const result = await postAnalyzeColorLevels(imageStore.image)
     if (result) {
@@ -52,7 +52,6 @@ const getColorLevels = async () => {
 }
 
 const invertImage = async () => {
-  console.log(imageStore.image)
   if (imageStore.image) {
     const newImage = await postInvertColors(imageStore.image)
     if (newImage) {
@@ -60,35 +59,27 @@ const invertImage = async () => {
     }
   }
 }
+
+const healthCheck = async () => {
+  const message = await getHealth()
+  alert(message)
+}
 </script>
 
 <template>
   <main>
     <div class="input-wrapper">
-      <div
-        class="dropzone"
-        @dragover.prevent
-        accept="image/png, image/jpeg"
-        @dragenter.prevent
-        @dragstart.prevent
-        @drop.prevent="handleDragEvent($event)"
-      >
-        <input
-          id="file-input"
-          type="file"
-          accept="image/png, image/jpeg"
-          required
-          @change="handleInputEvent($event)"
-        />
+      <div class="dropzone" @dragover.prevent accept="image/png, image/jpeg" @dragenter.prevent @dragstart.prevent
+        @drop.prevent="handleDragEvent($event)">
+        <input id="file-input" type="file" accept="image/png, image/jpeg" required @change="handleInputEvent($event)" />
         <h2 for="file-input">Click or Drag N Drop Image</h2>
         <img v-if="imageStore.image" v-bind:src="imageStore.image as string" />
-        <!-- <h3 v-if="preview">File name: {{ fileName }}</h3> -->
+        <h3 v-if="imageStore.image">File name: {{ fileName }}</h3>
       </div>
       <div class="button-wrapper">
-        <button type="submit" v-on:click="getColorLevels">Get color levels</button>
-        <button type="submit" v-on:click="invertImage">Invert colors</button>
-        <button type="submit" @click="getRequest">HealthCheck</button>
-        <!--   <h3 v-if="success">File Uploaded Successfully. publicId: {{ success }}</h3> -->
+        <button type="submit" :disabled="!imageStore.image" v-on:click="getColorLevels">Get color levels</button>
+        <button type="submit" :disabled="!imageStore.image" v-on:click="invertImage">Invert colors</button>
+        <button type="submit" @click="healthCheck">HealthCheck</button>
       </div>
     </div>
   </main>
@@ -140,6 +131,12 @@ button {
   font-weight: 700;
   width: 100%;
   padding: auto;
+}
+
+button:disabled {
+  color: #666;
+  border-color: #666;
+  pointer-events: none;
 }
 
 .input-wrapper {
