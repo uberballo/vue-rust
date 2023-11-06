@@ -66,7 +66,7 @@ fn convert_jpg_to_base64(
 #[test]
 fn convert_jpg_to_base64_works() {
     let img = image::open("image.jpg").expect("FileNotFound");
-    let content = convert_jpg_to_base64(img, ImageOutputFormat::Jpeg(65), "Jpeg").unwrap();
+    let content = convert_jpg_to_base64(img, ImageOutputFormat::Jpeg(65), "image/Jpeg").unwrap();
     let text = read_file_string("img-base64.txt");
     assert_eq!(content, text);
 }

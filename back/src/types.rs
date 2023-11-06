@@ -1,5 +1,4 @@
-
-use image::{Rgb, ImageFormat, DynamicImage};
+use image::{DynamicImage, ImageFormat, Rgb};
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
 use crate::utils::rgb_to_hex;
@@ -12,13 +11,17 @@ pub struct ColorLevels {
 #[derive(Serialize, Debug)]
 pub struct ColorLevel {
     pub color: String,
-    pub rgb: [u8;3],
-    pub count: isize
+    pub rgb: [u8; 3],
+    pub count: isize,
 }
 
 impl ColorLevel {
     fn new(rgb: Rgb<u8>, count: isize) -> ColorLevel {
-        ColorLevel { color: rgb_to_hex(rgb), rgb: rgb.0, count: count }
+        ColorLevel {
+            color: rgb_to_hex(rgb),
+            rgb: rgb.0,
+            count: count,
+        }
     }
 }
 
@@ -36,21 +39,12 @@ impl Serialize for ColorLevels {
         let vector = &self.levels;
         let mut json = serializer.serialize_struct("colors", vector.len())?;
         let colors: Vec<ColorLevel> = vector.iter().map(|x| ColorLevel::new(x.0, x.1)).collect();
-        json.serialize_field(
-            "colorLevels",&colors
-        )?;
+        json.serialize_field("colorLevels", &colors)?;
         json.end()
     }
 }
 
 pub struct DataUrl {
     pub format: ImageFormat,
-    pub data: String
-}
-
-
-// DynamicImage doesn't contain any information about the format.
-pub struct ImageWithFormat {
-    pub image: DynamicImage,
-    pub format: ImageFormat
+    pub data: String,
 }

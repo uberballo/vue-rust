@@ -6,7 +6,6 @@ use crate::{
     types::{ColorLevels, UploadData},
 };
 
-// TODO User may send .png file which is not supported. Handle it properly.
 #[debug_handler]
 pub async fn get_color_levels(
     Json(payload): Json<UploadData>,
