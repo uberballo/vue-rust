@@ -62,7 +62,7 @@ const invertImage = async () => {
 
 const healthCheck = async () => {
   const message = await getHealth()
-  alert(message)
+  alert(message.data || message)
 }
 </script>
 

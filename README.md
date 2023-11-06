@@ -16,7 +16,8 @@ After everything is up and running, you can access the service on `localhost`.
 If we'd like to achieve a production-quality software, we need to add and/or update quite a bit. 
 
 - [ ] E2E-tests.  
-- [ ] CI/CD pipeline.
+- [X] CI pipeline.
+- [ ] CD pipeline.
 - [ ] Improved tracing and logging.  
 - [ ] Performance tests.  
 - [ ] Authorization.  

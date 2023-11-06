@@ -1,6 +1,10 @@
 use axum::{http::StatusCode, response::IntoResponse, routing::get, routing::post, Router};
 use http::header::CONTENT_TYPE;
-use tower_http::trace::TraceLayer;
+use tower_http::{
+    trace::{DefaultMakeSpan, DefaultOnRequest, DefaultOnResponse, TraceLayer},
+    LatencyUnit,
+};
+use tracing::Level;
 
 use crate::controllers;
 
@@ -14,11 +18,10 @@ impl Server {
     }
 
     pub async fn start(&self) {
-
         tracing_subscriber::fmt::init();
 
         let routes = Router::new()
-            .route("/", get(|| async { "Hello, World!" }))
+            .route("/", get(|| async { "Healthy!" }))
             .route(
                 "/levels",
                 post(controllers::image_controller::get_color_levels),
@@ -30,7 +33,16 @@ impl Server {
 
         let app = Router::new()
             .merge(routes)
-            .layer(TraceLayer::new_for_http())
+            .layer(
+                TraceLayer::new_for_http()
+                    .make_span_with(DefaultMakeSpan::new().include_headers(true))
+                    .on_request(DefaultOnRequest::new().level(Level::INFO))
+                    .on_response(
+                        DefaultOnResponse::new()
+                            .level(Level::INFO)
+                            .latency_unit(LatencyUnit::Micros),
+                    ),
+            )
             .layer(
                 tower_http::cors::CorsLayer::new()
                     .allow_origin(tower_http::cors::Any)

@@ -1,4 +1,4 @@
-use image::{DynamicImage, ImageFormat, Rgb};
+use image::{ImageFormat, Rgb};
 use serde::{ser::SerializeStruct, Deserialize, Serialize, Serializer};
 
 use crate::utils::rgb_to_hex;
