@@ -1,5 +1,5 @@
 # Vue-rust project  
-
+[![ci](https://github.com/uberballo/vue-rust/actions/workflows/ci.yml/badge.svg)](https://github.com/uberballo/vue-rust/actions/workflows/ci.yml)
 ### What  
 Simple fullstack project with `Vue` frontend and `Rust` backend. Allows the user to upload pictures, find the most common colors and invert the picture. There are still many areas to improve on, more on the [To do section](#to-do) 
 
